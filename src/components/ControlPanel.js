@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addSprite,
@@ -18,6 +18,7 @@ const ControlPanel = () => {
   const sprite = sprites.find((sprite) => sprite.id === selectedSprite);
 
   const isRunning = sprite?.isRunning;
+  const runningRef = useRef(isRunning);
 
   useEffect(() => {
     if (selectedSprite && sprite) {
@@ -26,7 +27,7 @@ const ControlPanel = () => {
   }, [selectedSprite, sprite, dispatch]);
 
   const executeBlocks = async () => {
-    if (!sprite || !sprite.blocks.length || !isRunning)  return;
+    if (!sprite || !sprite.blocks.length || !runningRef.current) return;
 
     for (const block of sprite.blocks) {
       switch (block.type) {
@@ -35,7 +36,7 @@ const ControlPanel = () => {
           break;
 
         case "looks":
-          handleLooks(block);
+          await handleLooks(block);
           break;
 
         case "control":
@@ -45,6 +46,10 @@ const ControlPanel = () => {
         default:
           break;
       }
+    }
+
+    if (!sprite.blocks.some((block) => block.action === "repeatForever")) {
+      dispatch(setRunning({ id: selectedSprite, isRunning: false }));
     }
   };
 
@@ -75,58 +80,59 @@ const ControlPanel = () => {
   };
 
   const handleLooks = (block) => {
-    if (block.action === "sayHello") {
-      dispatch(
-        updateSprite({ id: selectedSprite, changes: { speech: "Hello" } })
-      );
-      setTimeout(() => {
-        dispatch(updateSprite({ id: selectedSprite, changes: { speech: "" } }));
-      }, 2000);
-    } else if (block.action === "thinkHmm") {
-      dispatch(
-        updateSprite({ id: selectedSprite, changes: { speech: "Hmm..." } })
-      );
-      setTimeout(() => {
-        dispatch(updateSprite({ id: selectedSprite, changes: { speech: "" } }));
-      }, 2000);
-    }
+    return new Promise((resolve) => {
+      if (block.action === "sayHello") {
+        dispatch(
+          updateSprite({ id: selectedSprite, changes: { speech: "Hello" } })
+        );
+        setTimeout(() => {
+          dispatch(
+            updateSprite({ id: selectedSprite, changes: { speech: "" } })
+          );
+          resolve();
+        }, 2000);
+      } else if (block.action === "thinkHmm") {
+        dispatch(
+          updateSprite({ id: selectedSprite, changes: { speech: "Hmm..." } })
+        );
+        setTimeout(() => {
+          dispatch(
+            updateSprite({ id: selectedSprite, changes: { speech: "" } })
+          );
+          resolve();
+        }, 2000);
+      } else {
+        resolve();
+      }
+    });
   };
 
   const handleControl = (block) => {
     return new Promise((resolve) => {
       if (block.action === "wait3Second") {
         setTimeout(resolve, 3000);
-      }else if(block.action === "repeatForever"){
-        const repeatForever = async() => {
-          while(sprite.isRunning){
-            await executeBlocks();
-          };
-
-        }
-        repeatForever().then(resolve)
-      }
-      else if(block.action === 'when10Times'){
-        const repeat = async(times) => {
-          for(let i=0; i<times; i++){
-            if(!sprite.isRunning)break;
-            await executeBlocks();
+      } else if (block.action === "repeatForever") {
+        const repeatForever = async () => {
+          while (runningRef.current) {
+            for (const blk of sprite.blocks) {
+              if (!runningRef.current) break;
+              await executeBlocks();
+            }
           }
+          resolve();
         };
-
-        repeat(10).then(resolve);
+        repeatForever();
+      } else {
+        resolve();
       }
     });
   };
 
   useEffect(() => {
-    let interval;
+    runningRef.current = isRunning;
     if (isRunning) {
-      interval = setInterval(executeBlocks, 500);
-    } else if (!isRunning && interval) {
-      clearInterval(interval);
+      executeBlocks();
     }
-
-    return () => clearInterval(interval);
   }, [isRunning, sprite?.blocks]);
 
   const handleaddSprite = () => {

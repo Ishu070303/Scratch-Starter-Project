@@ -23,7 +23,6 @@ const actions = {
   Control: [
     { action: "wait3Second", label: "should wait for 3 seconds" },
     { action: "repeatForever", label: "should Reapeat Forever" },
-    { action: "when10Times", label: "should Repeat 10 times" },
   ],
 };
 
