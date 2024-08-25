@@ -27,7 +27,7 @@ const MidArea = () => {
       <h2 className="text-center font-medium text-sm">{`Drop Actions Here!`}</h2>
         {
           sprite?.blocks?.map((block, index) => (
-            <DraggableBlock key={index} block={block} />
+            <DraggableBlock key={index} block={block} disabled={true} />
           ))
         }
       </div>
