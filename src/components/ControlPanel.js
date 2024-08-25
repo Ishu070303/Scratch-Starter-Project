@@ -111,17 +111,6 @@ const ControlPanel = () => {
     return new Promise((resolve) => {
       if (block.action === "wait3Second") {
         setTimeout(resolve, 3000);
-      } else if (block.action === "repeatForever") {
-        const repeatForever = async () => {
-          while (runningRef.current) {
-            for (const blk of sprite.blocks) {
-              if (!runningRef.current) break;
-              await executeBlocks();
-            }
-          }
-          resolve();
-        };
-        repeatForever();
       } else {
         resolve();
       }
@@ -169,12 +158,6 @@ const ControlPanel = () => {
       if (e.key === " ") {
         sprite.blocks.forEach((block) => {
           if (block.action === "whenSpacePressed") {
-            executeBlocks();
-          }
-        });
-      } else if (e.key === "ArrowUp") {
-        sprite.blocks.forEach((block) => {
-          if (block.action === "whenUpKeyPressed") {
             executeBlocks();
           }
         });

@@ -5,7 +5,6 @@ import SidebarMenu from "../components/SidebarMenu";
 const actions = {
   Event: [
     { action: "whenSpacePressed", label: "When Space key Pressed" },
-    { action: "whenUpKeyPressed", label: "When up arrow key Pressed" },
   ],
 
   Motion: [
@@ -22,7 +21,6 @@ const actions = {
 
   Control: [
     { action: "wait3Second", label: "should wait for 3 seconds" },
-    { action: "repeatForever", label: "should Reapeat Forever" },
   ],
 };
 
