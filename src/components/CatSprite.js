@@ -1,7 +1,20 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
-export default function CatSprite() {
+export default function CatSprite({ id }) {
+  const sprite = useSelector((state) => state.sprites.sprites.find((sprite) => sprite.id === id) || {
+    x: 0,
+    y: 0, 
+    rotation: 0,
+    speech: "",
+  });
+
+  const spriteStyle = {
+    transform: `translate(${sprite.x}px, ${sprite.y}px) rotate(${sprite.rotation}deg)`,
+    transition: 'transform 0.5s'
+  }
   return (
+    <div style={{ position: 'relative', display: 'inline-block' }}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="95.17898101806641"
@@ -9,6 +22,7 @@ export default function CatSprite() {
       viewBox="0.3210171699523926 0.3000000357627869 95.17898101806641 100.04156036376953"
       version="1.1"
       xmlSpace="preserve"
+      style={spriteStyle}
     >
       <g>
         <g id="Page-1" stroke="none" fillRule="evenodd">
@@ -180,5 +194,11 @@ export default function CatSprite() {
         </g>
       </g>
     </svg>
+    {sprite.speech && (
+      <div className="absolute top-2 left-5 transform -translate-x-1/2 bg-white p-1 border rounded">
+        {sprite.speech}
+      </div>
+    )}
+    </div>
   );
 }

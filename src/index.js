@@ -1,13 +1,15 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import App from "./App";
 import "tailwindcss/tailwind.css";
+import "./index.css";
 
 console.log("hi");
+const rootElement = document.getElementById('root');
+const root = createRoot(rootElement);
 
-ReactDOM.render(
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+  </React.StrictMode>
+)

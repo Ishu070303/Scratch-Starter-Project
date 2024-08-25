@@ -1,32 +1,86 @@
-import React from "react";
-import Icon from "./Icon";
+import React, { useState } from "react";
+import { useDrag } from "react-dnd";
+import SidebarMenu from "../components/SidebarMenu";
 
-export default function Sidebar() {
+const actions = {
+  Event: [
+    { action: "whenSpacePressed", label: "When Space key Pressed" },
+    { action: "whenUpKeyPressed", label: "When up arrow key Pressed" },
+  ],
+
+  Motion: [
+    { action: "move10Steps", label: "Move 10 Steps" },
+    { action: "turnClockwise", label: "Turn clockwise 50 Degree" },
+    { action: "turnAntiClockwise", label: "Turn anticlockwise 50 Degree" },
+    { action: "changeXBy10", label: "Change X by 10" },
+  ],
+
+  Looks: [
+    { action: "sayHello", label: "Say Hello for 2 seconds" },
+    { action: "thinkHmm", label: "Think Hmm for 2 seconds " },
+  ],
+
+  Control: [
+    { action: "wait3Second", label: "should wait for 3 seconds" },
+    { action: "repeatForever", label: "should Reapeat Forever" },
+    { action: "when10Times", label: "should Repeat 10 times" },
+  ],
+};
+
+const Sidebar = () => {
+  const [selectedCategory, setSelectedCategory] = useState("Event");
   return (
-    <div className="w-60 flex-none h-full overflow-y-auto flex flex-col items-start p-2 border-r border-gray-200">
-      <div className="font-bold"> {"Events"} </div>
-      <div className="flex flex-row flex-wrap bg-yellow-500 text-white px-2 py-1 my-2 text-sm cursor-pointer">
-        {"When "}
-        <Icon name="flag" size={15} className="text-green-600 mx-2" />
-        {"clicked"}
+    <div className="w-80 h-full flex justify-around border-2 border-gray-300">
+      <div className="">
+        {" "}
+        <SidebarMenu
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
       </div>
-      <div className="flex flex-row flex-wrap bg-yellow-500 text-white px-2 py-1 my-2 text-sm cursor-pointer">
-        {"When this sprite clicked"}
-      </div>
-      <div className="font-bold"> {"Motion"} </div>
-      <div className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 text-sm cursor-pointer">
-        {"Move 10 steps"}
-      </div>
-      <div className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 text-sm cursor-pointer">
-        {"Turn "}
-        <Icon name="undo" size={15} className="text-white mx-2" />
-        {"15 degrees"}
-      </div>
-      <div className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 text-sm cursor-pointer">
-        {"Turn "}
-        <Icon name="redo" size={15} className="text-white mx-2" />
-        {"15 degrees"}
+      <div className="border-l-2 border-gray-300  h-full flex flex-col gap-2 p-2">
+        <div className="font-bold"> {selectedCategory} </div>
+        {actions[selectedCategory].map((action, index) => (
+          <DraggableSidebarItems
+            key={index}
+            type={selectedCategory.toLowerCase()}
+            action={action.action}
+            label={action.label}
+          />
+        ))}
       </div>
     </div>
   );
-}
+};
+
+const DraggableSidebarItems = ({ type, action, label }) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: "block",
+    item: { type, action, label },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  const blockColor =
+    type === "motion"
+      ? "bg-blue-400"
+      : type === "control"
+      ? "bg-red-400"
+      : type === "looks"
+      ? "bg-purple-400"
+      : "bg-yellow-400";
+
+  return (
+    <div
+      ref={drag}
+      className={`bg-gray-200 w-[400px] text-center px-2 py-1 rounded-md my-2 text-white font-medium text-sm cursor-grab ${blockColor} ${
+        isDragging ? "opacity-20 cursor-grabbing" : "opacity-100"
+      }`}
+    >
+      {label}
+    </div>
+  );
+};
+
+export default Sidebar;
