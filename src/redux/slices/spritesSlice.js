@@ -10,6 +10,7 @@ const initialState = {
       isRunning: false,
       blocks: [],
       speech: "",
+      hidden: false,
     },
   ],
   selectedSprite: 1,
@@ -29,6 +30,7 @@ const spritesSlice = createSlice({
         isRunning: false,
         blocks: [],
         speech: "",
+        hidden: false,
       };
       state.sprites.push(newSprite);
       state.selectedSprite = newSprite.id;
@@ -77,6 +79,7 @@ const spritesSlice = createSlice({
       if(sprite){
         sprite.blocks = [];
         sprite.speech = "";
+        sprite.hidden = false;
       }
     }
 

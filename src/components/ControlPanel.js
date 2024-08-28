@@ -29,27 +29,29 @@ const ControlPanel = () => {
   const executeBlocks = async () => {
     if (!sprite || !sprite.blocks.length || !runningRef.current) return;
 
-    for (const block of sprite.blocks) {
-      switch (block.type) {
-        case "motion":
-          await handleMotion(block);
-          break;
-
-        case "looks":
-          await handleLooks(block);
-          break;
-
-        case "control":
-          await handleControl(block);
-          break;
-
-        default:
-          break;
-      }
+    for (let i = 0; i < sprite.blocks.length; i++) {
+      const block = sprite.blocks[i];
+      await handleBlockExecution(block);
     }
 
     if (!sprite.blocks.some((block) => block.action === "repeatForever")) {
       dispatch(setRunning({ id: selectedSprite, isRunning: false }));
+    }
+  };
+
+  const handleBlockExecution = async (block) => {
+    switch (block.type) {
+      case "motion":
+        return handleMotion(block);
+
+      case "looks":
+        return handleLooks(block);
+
+      case "control":
+        return handleControl(block);
+
+      default:
+        return Promise.resolve();
     }
   };
 
@@ -72,6 +74,10 @@ const ControlPanel = () => {
             id: selectedSprite,
             changes: { rotation: sprite.rotation - 50 },
           })
+        );
+      } else if (block.action === "changeXBy10") {
+        dispatch(
+          updateSprite({ id: selectedSprite, changes: { x: sprite.x + 10 } })
         );
       }
 
@@ -101,6 +107,22 @@ const ControlPanel = () => {
           );
           resolve();
         }, 2000);
+      } else if (block.action === "showSprite") {
+        dispatch(
+          updateSprite({
+            id: selectedSprite,
+            changes: { hidden: false },
+          })
+        );
+        resolve();
+      } else if (block.action === "hideSprite") {
+        dispatch(
+          updateSprite({
+            id: selectedSprite,
+            changes: { hidden: true },
+          })
+        );
+        resolve();
       } else {
         resolve();
       }
@@ -111,6 +133,27 @@ const ControlPanel = () => {
     return new Promise((resolve) => {
       if (block.action === "wait3Second") {
         setTimeout(resolve, 3000);
+      } else if (block.action === "repeat") {
+        let times = 5;
+        const repeatBlockExecution = async () => {
+          for (let i = 0; i < times; i++) {
+            await executeBlocks();
+          }
+
+          resolve();
+        };
+
+        repeatBlockExecution();
+      } else if (block.action === "repeatForever") {
+        const repeatForeverExecution = async () => {
+          while (runningRef.current) {
+            await executeBlocks();
+          }
+
+          resolve();
+        };
+
+        repeatForeverExecution();
       } else {
         resolve();
       }

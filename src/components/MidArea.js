@@ -20,10 +20,13 @@ const MidArea = () => {
       }
     },
     collect: (monitor) => ({isOver: !!monitor.isOver()}),
-  })
+  });
+
+  const containerHeight = Math.max(256, sprite?.blocks.length * 50);
+
   return(
     <div className="flex-1 h-full overflow-auto p-4 border border-gray-300 flex items-center justify-center">
-      <div ref={drop} className={`w-64 h-64 p-4 border-2 border-gray-400 rounded ${isOver ? "bg-gray-200" : "bg-gray-100"} `}>
+      <div ref={drop} className={`w-64 h-64 p-4 border-2 border-gray-400 rounded ${isOver ? "bg-gray-200" : "bg-gray-100"} `} style={{ height: `${containerHeight}px`}}>
       <h2 className="text-center font-medium text-sm">{`Drop Actions Here!`}</h2>
         {
           sprite?.blocks?.map((block, index) => (

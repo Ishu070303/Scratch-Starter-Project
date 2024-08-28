@@ -17,10 +17,14 @@ const actions = {
   Looks: [
     { action: "sayHello", label: "Say Hello for 2 seconds" },
     { action: "thinkHmm", label: "Think Hmm for 2 seconds " },
+    { action: "hideSprite", label : "Hide Sprite"},
+    { action: "showSprite", label: "Show Sprite"},
   ],
 
   Control: [
     { action: "wait3Second", label: "should wait for 3 seconds" },
+    { action: "repeatForever", label: "Repeat Forever"},
+    { action: "repeat", label: "Repeat 5 times"},
   ],
 };
 
